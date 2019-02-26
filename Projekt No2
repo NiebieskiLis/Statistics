@@ -1,0 +1,49 @@
+##Projekt 2
+#install.packages("devtools")
+#library(devtools)
+#install_github("pbiecek/Diagnoza") 
+#library(Diagnoza)
+#install.packages("weights") 
+library("weights")
+data("gospodarstwa")
+data("gospodarstwaDict")
+data("osoby")
+data("osobyDict")
+
+#library(IPSUR)
+#library(TeachingDemos)
+#Problem numer 1
+#Porównuję średnie z dwóch różnych lat i sprawdzam czy się zmieniły
+##Ho Średni wzrost z obu lat jest sobie równy
+##Ha W 2015 roku ludzie są statystycznie wyżsi
+pytanie1<-osoby[,c('hp52','waga_2015_osoby')]
+pytanie1<-na.omit(pytanie1)
+pytanie2<-osoby[,c('fp55','waga_2011_osoby')]
+pytanie2<-na.omit(pytanie2)
+test1<-wtd.t.test(pytanie1$hp52, pytanie2$fp55, weight=pytanie1$waga_2015_osoby, weighty=pytanie2$waga_2011_osoby, alternative="grater")
+hist1<-wtd.hist(pytanie1$hp52, weight = pytanie1$waga_2015_osoby, col=rainbow(30), main="Histogram roku 2015")
+hist2<-wtd.hist(pytanie2$fp55, weight = pytanie2$waga_2011_osoby, col=rainbow(30),main="Histogram roku 2011" ) 
+boxplot(pytanie1$hp52 ,pytanie2$fp55, col=topo.colors(10), main="Boxploty średnich wag ludzi",horizontal = TRUE)
+test1
+#Na podstawie wyniku testu odrzucamy hipotezę zeroważ i średni wzrost osób
+#w 2011 jest statystycznie większy od tego w 2011
+
+##Pytanie 3
+##Chciałabym sprawdzić jak mają się do siebie silne bóle głowy i dreszcz i dragawki
+##Ho Mówi że pomiędzy tymi danymi nie ma powiązania
+##Ha Mówi że jednak częstotliwość silnych bólów głowy oraz dreszczy z drgawkami jest od siebie zależna
+
+pytanie315<-osoby[,c('hp62_10','hp62_01','waga_2015_osoby')]
+pytanie315<-na.omit(pytanie315)
+
+#Ho Bóle głowy oraz drgawki występują w takim samym stopniu 
+#Ha dreszcze i drgawki statystycznie występują częściej
+test3<-wtd.chi.sq(var1=pytanie315$hp62_10,var2=pytanie315$hp62_01 ,weight=as.numeric(pytanie315$waga_2015_osoby) )
+
+test3
+#W obliczu tego testu udało się obalić hipotezę zerową (p-value < niż 0.05)
+
+#Tabela odpowiedzi (nie bierze ppod uwagę wag)
+tab<-(table(pytanie315$hp62_10,pytanie315$hp62_01))
+#
+barplot(tab , col=topo.colors(4) , main = "Barplot obu odpowiedzi(pytanie 1 w stosunku do 2)",names.arg=c('Brak','Mniej niż 15 dni','min. połowa miesiąca'),horiz=TRUE)
