@@ -1,0 +1,34 @@
+#Projekt nr 1
+
+#Aleksandra Rezetka
+# s171889
+
+##TASK 
+## 3. What is the distribution of long term return with the p=0.6 coin if you bet 10%, 20% (the Kelly),
+##30% (you can choose other percentages)?
+
+
+#firstly I've created a coin
+
+prob <- c(0.6 , 0.4)
+value <- c(1 , -1)
+coinA<-data.frame(value , prob)
+observations <-1000
+start<-50
+percentages<-100
+#Now let's create median Bankroll that we keep our propable return after our number of observations
+medianBankroll<-rep(0 , 100)
+
+
+##Let's assume that we start with 50$
+
+bank<-start
+#median_sucess keeps the amount of sucesses in no. of observations given that the probability of head is coinA$prob[1]
+(median_sucess<-qbinom(0.5,observations , coinA$prob[1]))
+
+##Now lets see the return after 1000 tosses within different stakes
+for(j in 1:percentages) {
+medianBankroll[j]<-bank*(1+j/percentages)^median_sucess*(1-j/percentages)^(observations-median_sucess)
+}
+plot(medianBankroll , type = 'h', col=rainbow(20) , xlab="fraction" , ylab = "amount we can gain after 1000 tosses" , main="How the amount we stake correspond to amount we can gain")
+#As we can see when we choose the 20% strategy we gain the most.
